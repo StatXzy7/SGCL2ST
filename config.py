@@ -7,14 +7,14 @@ debug = True
 lr = 1e-3 #
 weight_decay = 1e-3 #
 patience = 3
-step = 20
+step = 50
 factor = 0.1
 # epochs = 10
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model_name = 'resnet50_baseline'
 image_embedding = 2048
-spot_embedding = 171 #HER2:785, cSCC:171
+spot_embedding = 785 #HER2:785, cSCC:171
 
 pretrained = True
 trainable = True 
