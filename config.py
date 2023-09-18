@@ -4,11 +4,11 @@
 debug = True
 # batch_size = 128
 # num_workers = 0
-lr = 1e-3
-weight_decay = 1e-3
+lr = 1e-3 #
+weight_decay = 1e-3 #
 patience = 3
-step = 10
-factor = 0.5
+step = 20
+factor = 0.1
 # epochs = 10
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

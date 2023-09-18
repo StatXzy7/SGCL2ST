@@ -96,7 +96,7 @@ class myModel(nn.Module):
         self.spot_projection = ProjectionHead(embedding_dim = spot_embedding) #3467 shared hvgs  projection_dim spot_embedding
         self.temperature = temperature
         self.rmse = 0.1
-        self.zinb = 0.05
+        self.zinb = 0.25
 
 
     def forward(self, patches, centers, exps, adj, oris, sfs):
