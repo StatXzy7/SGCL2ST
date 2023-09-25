@@ -34,7 +34,7 @@ parser.add_argument('--model', type=str, default='auto', help='')
 
 # Hi
 parser.add_argument('--name', type=str, default='hist2ST', help='prefix name.')
-parser.add_argument('--data', type=str, default='her2st', help='dataset name:{"her2st","cscc"}.')
+parser.add_argument('--data', type=str, default='cscc', help='dataset name:{"her2st","cscc"}.')
 parser.add_argument('--logger', type=str, default='../logs/my_logs', help='logger path.')
 parser.add_argument('--fold', type=int, default=5, help='dataset fold.')
 parser.add_argument('--prune', type=str, default='Grid', help='how to prune the edge:{"Grid","NA"}')
@@ -180,10 +180,10 @@ def main():
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=CFG.lr, weight_decay=CFG.weight_decay
     )
-    # lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-    #     optimizer, mode="min", patience=CFG.patience, factor=CFG.factor
-    # )
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=CFG.step, gamma=CFG.factor)
+    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode="min", patience=CFG.patience, factor=CFG.factor
+    )
+    # lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=CFG.step, gamma=CFG.factor)
 
     
     
@@ -205,8 +205,8 @@ def main():
             test_loss = test_epoch(model, test_loader)
         
         # Update learning rate
-        lr_scheduler.step()
-        # lr_scheduler.step(test_loss.avg)
+        # lr_scheduler.step()
+        lr_scheduler.step(test_loss.avg)
         
         if test_loss.avg < best_loss and rank == 0:
             if not os.path.exists(str(args.exp_name)):

@@ -6,9 +6,11 @@ debug = True
 # num_workers = 0
 lr = 1e-3 #
 weight_decay = 1e-3 #
-patience = 3
-step = 50
-factor = 0.1
+patience = 5
+step = 30
+factor = 0.2
+
+# HER2  patience = 5 factor = 0.2
 # epochs = 10
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

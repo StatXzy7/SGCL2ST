@@ -11,5 +11,5 @@ gzip -d ./her2st/data/ST-cnts/*.tsv.gz
 mkdir -p ./GSE144240_RAW  
 tar -xvf ./GSE144240_RAW.tar -C GSE144240_RAW/ 
 cd GSE144240_RAW  
-for file in *.gz; do gunzip -f "$file"; done  
+for file in *.gz; do gunzip -f "$file"; done
 
