@@ -1,2 +1,2 @@
-# ICL2ST
-Contrastive Learning for Integrated Expression Prediction and Data Imputation in Spatial Transcriptomics 
+# SGCL2ST
+Spatial guided contrast learning for transcriptomic profile prediction from histology images
