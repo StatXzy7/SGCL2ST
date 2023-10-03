@@ -3,3 +3,4 @@ data/GSE144240_RAW/
 data/her2st/
 figures/
 model/
+__pycache__/
