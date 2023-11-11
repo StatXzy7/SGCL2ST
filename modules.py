@@ -10,56 +10,6 @@ import numpy as np
 import torch.nn.functional as F
 from torch.nn.parameter import Parameter
 
-class ImageEncoder(nn.Module):
-    """
-    Encode images to a fixed size vector
-    """
-
-    def __init__(
-        self, model_name=CFG.model_name, pretrained=CFG.pretrained, trainable=CFG.trainable,
-        n_genes = 785, encode_dim = 1024,
-        channel=32, patch_size=7, kernel_size=5, conv_layers = 2,
-        heads=8, dim_head=64, mlp_dim=1024, dropout = 0.2, depth_trans = 8, depth_gnn = 2
-    ):
-        super().__init__()
-        # self.model = timm.create_model(
-        #     model_name, pretrained, num_classes=0, global_pool="avg"
-        # )
-        # for p in self.model.parameters():
-        #     p.requires_grad = trainable
-        
-        self.patch_embedding = nn.Conv2d(3,channel,patch_size,patch_size) # 112/7 = 16
-        self.conv2d_layers = nn.Sequential(*[Conv2d_block(channel,kernel_size) for i in range(conv_layers)],) 
-        self.flat=nn.Sequential(
-            nn.Conv2d(channel,channel//8,1,1), # 4*16*16
-            nn.Flatten(),
-        )
-        # self.gnn = Sequential('x, edge_index', [
-        #     (TransformerConv(encode_dim, encode_dim), 'x, edge_index -> x1'),
-        #     BatchNorm(encode_dim),
-        #     nn.ReLU(), 
-        #     ])
-        self.gnn_layers = nn.ModuleList()
-        for i in range(depth_gnn):       
-            gnn = Sequential('x, edge_index', [
-                        (TransformerConv(encode_dim, encode_dim), 'x, edge_index -> x1'),
-                        BatchNorm(encode_dim),
-                        nn.ReLU(), 
-                        ])
-            self.gnn_layers.append(gnn)
-        
-        self.Transformer = nn.Sequential(*[attn_block(encode_dim,heads,dim_head,mlp_dim,dropout) for i in range(depth_trans)])
-        
-    def forward(self, x, adj):
-        x = self.patch_embedding(x)
-        x = self.conv2d_layers(x)
-        x = self.flat(x)
-        pos = x
-        for layer in self.gnn_layers:
-            pos = layer(pos,adj)
-        x = self.Transformer((x + pos).unsqueeze(0)).squeeze(0)
-        return x
-
 class SpotEncoder(nn.Module):
     """
     Encode spots gene expression to a fixed size vector using GCN layers.
@@ -211,7 +161,56 @@ class ImageEncoder_resnet50(nn.Module):
     def forward(self, x):
         return self.model(x)
     
+class ImageEncoder(nn.Module):
+    """
+    Encode images to a fixed size vector
+    """
 
+    def __init__(
+        self, model_name=CFG.model_name, pretrained=CFG.pretrained, trainable=CFG.trainable,
+        n_genes = 785, encode_dim = 1024,
+        channel=32, patch_size=7, kernel_size=5, conv_layers = 2,
+        heads=8, dim_head=64, mlp_dim=1024, dropout = 0.2, depth_trans = 8, depth_gnn = 2
+    ):
+        super().__init__()
+        # self.model = timm.create_model(
+        #     model_name, pretrained, num_classes=0, global_pool="avg"
+        # )
+        # for p in self.model.parameters():
+        #     p.requires_grad = trainable
+        
+        self.patch_embedding = nn.Conv2d(3,channel,patch_size,patch_size) # 112/7 = 16
+        self.conv2d_layers = nn.Sequential(*[Conv2d_block(channel,kernel_size) for i in range(conv_layers)],) 
+        self.flat=nn.Sequential(
+            nn.Conv2d(channel,channel//8,1,1), # 4*16*16
+            nn.Flatten(),
+        )
+        # self.gnn = Sequential('x, edge_index', [
+        #     (TransformerConv(encode_dim, encode_dim), 'x, edge_index -> x1'),
+        #     BatchNorm(encode_dim),
+        #     nn.ReLU(), 
+        #     ])
+        self.gnn_layers = nn.ModuleList()
+        for i in range(depth_gnn):       
+            gnn = Sequential('x, edge_index', [
+                        (TransformerConv(encode_dim, encode_dim), 'x, edge_index -> x1'),
+                        BatchNorm(encode_dim),
+                        nn.ReLU(), 
+                        ])
+            self.gnn_layers.append(gnn)
+        
+        self.Transformer = nn.Sequential(*[attn_block(encode_dim,heads,dim_head,mlp_dim,dropout) for i in range(depth_trans)])
+        
+    def forward(self, x, adj):
+        x = self.patch_embedding(x)
+        x = self.conv2d_layers(x)
+        x = self.flat(x)
+        pos = x
+        for layer in self.gnn_layers:
+            pos = layer(pos,adj)
+        x = self.Transformer((x + pos).unsqueeze(0)).squeeze(0)
+        return x
+    
 class ProjectionHead(nn.Module):
     def __init__(
         self,
