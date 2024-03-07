@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description='DDP for CLIP')
 parser.add_argument('--exp_name', type=str, default='clip', help='')
 parser.add_argument('--batch_size', type=int, default=256, help='')
 parser.add_argument('--max_epochs', type=int, default=200, help='')
-parser.add_argument('--num_workers', type=int, default=0, help='')
+parser.add_argument('--num_workers', type=int, default=4, help='')
 
 parser.add_argument('--init_method', default='tcp://127.0.0.1:3456', type=str, help='')
 # parser.add_argument('--dist-backend', default='gloo', type=str, help='')
@@ -57,9 +57,9 @@ def pk_load(fold,mode='train',flatten=False,dataset='her2st',r=4,ori=True,adj=Tr
 
 def build_loaders(args):
     trainset = pk_load(args.fold,'train',False,args.data,neighs=args.neighbor, prune=args.prune)
-    train_loader = DataLoader(trainset, batch_size=1, num_workers=0, shuffle=True)
+    train_loader = DataLoader(trainset, batch_size=1, num_workers=4, shuffle=True)
     testset = pk_load(args.fold,'test',False,args.data,neighs=args.neighbor, prune=args.prune)
-    test_loader = DataLoader(testset, batch_size=1, num_workers=0, shuffle=False)
+    test_loader = DataLoader(testset, batch_size=1, num_workers=4, shuffle=False)
     return train_loader, test_loader
 
 def cleanup():
@@ -147,7 +147,7 @@ def main():
     ngpus_per_node = torch.cuda.device_count()
     local_rank = int(os.environ.get("SLURM_LOCALID", 0))
     rank = int(os.environ.get("SLURM_LOCALID", 0))*ngpus_per_node + local_rank
-
+    
     current_device = local_rank
     torch.cuda.set_device(current_device)
 
